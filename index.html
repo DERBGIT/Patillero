@@ -118,28 +118,59 @@
             font-weight: 600; /* font-semibold */
             color: #1e3a8a; /* text-blue-800 */
         }
+        /* Estilo para sección nombre paciente */
+        #patient-section {
+            margin-bottom: 1.5rem; /* mb-6 */
+            padding: 1rem; /* p-4 */
+            background-color: #f9fafb; /* bg-gray-50 */
+            border-radius: 0.5rem; /* rounded-lg */
+            border: 1px solid #e5e7eb; /* border border-gray-200 */
+        }
+        #display-patient-name {
+            font-weight: 600; /* font-semibold */
+            color: #1d4ed8; /* text-blue-700 */
+        }
 
         /* --- ESTILOS PARA IMPRESIÓN --- */
         @media print {
             body {
-                background: none !important; /* Fondo blanco para imprimir */
+                background: none !important;
                 padding: 0;
-                margin: 1cm; /* Margen de impresión */
-                font-family: sans-serif; /* Fuente simple */
-                color: #000 !important; /* Texto negro */
+                margin: 1cm;
+                font-family: sans-serif;
+                color: #000 !important;
             }
             /* Ocultar elementos no deseados */
-            header,
+            header > p, /* Ocultar subtítulo del header */
+            #patient-input-container, /* Ocultar input y botón guardar nombre */
             section.mb-8, /* Formulario Añadir Med */
-            #print-button, /* Botón/Icono de Imprimir */
-            #reset-week-button, /* Botón Reiniciar */
-            #import-csv-button, /* Botón Importar */
-            #export-csv-button, /* Botón Exportar */
+            #print-button,
+            #reset-week-button,
+            #import-csv-button,
+            #export-csv-button,
             .modal,
-            .actionsDiv /* Botones Editar/Eliminar en tarjetas */
+            .actionsDiv
              {
                 display: none !important;
             }
+             /* Mostrar y estilizar nombre de paciente */
+            #patient-section {
+                background: none !important;
+                border: none !important;
+                padding: 0 0 0.5cm 0 !important; /* Espacio debajo */
+                margin-bottom: 0.5cm !important;
+                text-align: left;
+            }
+             #display-patient-name-container {
+                 font-size: 14pt;
+                 font-weight: bold;
+                 color: #000 !important;
+             }
+             #display-patient-name {
+                 font-weight: bold;
+                 color: #000 !important;
+             }
+
             /* Ajustar contenedor principal */
             .container {
                 box-shadow: none !important;
@@ -151,22 +182,22 @@
             }
             /* Estilo de encabezados de grupo para impresión */
             .take-group-header {
-                background-color: #eee !important; /* Gris claro */
-                color: #000 !important; /* Texto negro */
+                background-color: #eee !important;
+                color: #000 !important;
                 margin-top: 1rem;
                 padding: 0.25rem 0.5rem;
                 border: 1px solid #ccc;
                 page-break-before: auto;
-                page-break-after: avoid; /* Evitar salto justo después */
+                page-break-after: avoid;
             }
             /* Estilo de tarjetas de medicamento para impresión */
-            #med-list > div:not(#no-meds-message) { /* Seleccionar solo las tarjetas */
+            #med-list > div:not(#no-meds-message) {
                 box-shadow: none !important;
                 border: 1px solid #ccc !important;
                 padding: 0.5rem !important;
-                margin-bottom: 0.5rem !important; /* Espacio entre tarjetas */
-                page-break-inside: avoid; /* Intentar no cortar tarjetas */
-                background: #fff !important; /* Fondo blanco */
+                margin-bottom: 0.5rem !important;
+                page-break-inside: avoid;
+                background: #fff !important;
             }
              /* Estilo de burbujas de día para impresión */
             .day-bubble {
@@ -174,18 +205,18 @@
                 width: 1.5rem !important;
                 height: 1.5rem !important;
                 font-size: 0.7rem !important;
-                line-height: 1.4rem !important; /* Ajustar línea vertical */
+                line-height: 1.4rem !important;
                 margin: 1px !important;
                 padding: 0 !important;
             }
             .day-bubble.taken {
-                background-color: #ccc !important; /* Gris para tomado */
+                background-color: #ccc !important;
                 color: #000 !important;
                 border-color: #666 !important;
                 transform: none !important;
             }
             .day-bubble:not(.taken) {
-                background-color: #fff !important; /* Blanco para no tomado */
+                background-color: #fff !important;
                 color: #333 !important;
             }
              /* Simplificar etiquetas de prioridad */
@@ -193,18 +224,17 @@
                 border: 1px solid #555;
                 padding: 0 0.3rem;
                 margin-left: 0.3rem;
-                background-color: #fff !important; /* Sin fondo */
+                background-color: #fff !important;
                 font-size: 0.7rem;
             }
-            .priority-alta { border-color: #000; color: #000 !important; font-weight: bold;} /* Negro y negrita */
-            .priority-media { border-color: #555; color: #000 !important; } /* Gris oscuro */
-            .priority-baja { border-color: #999; color: #333 !important; } /* Gris claro */
+            .priority-alta { border-color: #000; color: #000 !important; font-weight: bold;}
+            .priority-media { border-color: #555; color: #000 !important; }
+            .priority-baja { border-color: #999; color: #333 !important; }
 
             /* Asegurar texto negro en elementos generales */
             h1, h2, h3, h4, p, span, div, label, input, select, textarea {
                color: #000 !important;
             }
-            /* Ocultar placeholders en impresión si es necesario */
             input::placeholder, textarea::placeholder {
                 color: transparent !important;
             }
@@ -219,10 +249,21 @@
 
     <div class="container mx-auto max-w-4xl bg-white rounded-xl shadow-lg p-6 md:p-8">
 
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">Pastillero Semanal Virtual</h1>
-            <p class="text-gray-500 mt-2">Organiza y sigue tus medicamentos fácilmente.</p>
-        </header>
+        <header class="text-center mb-4"> <h1 class="text-3xl md:text-4xl font-bold text-gray-700">Pastillero Semanal Virtual</h1>
+            </header>
+
+        <section id="patient-section">
+             <div id="display-patient-name-container" class="mb-2 text-lg">
+                 Mostrando pastillero de: <span id="display-patient-name"></span>
+             </div>
+             <div id="patient-input-container" class="flex items-center gap-2">
+                 <label for="patient-name-input" class="text-sm font-medium text-gray-600">Editar Nombre Paciente:</label>
+                 <input type="text" id="patient-name-input" placeholder="Escribe el nombre aquí" class="flex-grow px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition duration-150 ease-in-out text-sm">
+                 <button id="save-patient-name-button" class="action-button bg-green-100 hover:bg-green-200 text-green-800">
+                     <i class="fas fa-save mr-1"></i> Guardar Nombre
+                 </button>
+             </div>
+        </section>
 
         <section class="mb-8 p-6 bg-blue-50 rounded-lg shadow">
             <h2 class="text-xl font-semibold text-gray-700 mb-4">Añadir Nuevo Medicamento</h2>
@@ -262,8 +303,9 @@
         </section>
 
         <section>
-             <div class="flex justify-between items-center mb-4 flex-wrap gap-2"> <h2 class="text-xl font-semibold text-gray-700">Mis Medicamentos</h2>
-                <div class="flex gap-2 items-center"> <button id="reset-week-button" title="Reiniciar Semana" class="action-button bg-yellow-100 hover:bg-yellow-200 text-yellow-800">
+             <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                <h2 class="text-xl font-semibold text-gray-700">Medicamentos</h2> <div class="flex gap-2 items-center">
+                    <button id="reset-week-button" title="Reiniciar Semana" class="action-button bg-yellow-100 hover:bg-yellow-200 text-yellow-800">
                         <i class="fas fa-undo mr-1"></i> Reiniciar Semana
                     </button>
                     <button id="import-csv-button" title="Importar Lista desde CSV" class="action-button bg-green-100 hover:bg-green-200 text-green-800">
@@ -346,15 +388,21 @@
         const editMedPriorityInput = document.getElementById('edit-med-priority');
         const editMedObservationsInput = document.getElementById('edit-med-observations');
         const printButton = document.getElementById('print-button');
-        const resetWeekButton = document.getElementById('reset-week-button'); // Botón Reiniciar Semana
-        const importCsvButton = document.getElementById('import-csv-button'); // Botón Importar CSV
-        const exportCsvButton = document.getElementById('export-csv-button'); // Botón Exportar CSV
-        const csvImportInput = document.getElementById('csv-import-input'); // Input oculto para importar
+        const resetWeekButton = document.getElementById('reset-week-button');
+        const importCsvButton = document.getElementById('import-csv-button');
+        const exportCsvButton = document.getElementById('export-csv-button');
+        const csvImportInput = document.getElementById('csv-import-input');
+        // Elementos para Nombre de Paciente
+        const patientNameInput = document.getElementById('patient-name-input');
+        const savePatientNameButton = document.getElementById('save-patient-name-button');
+        const displayPatientName = document.getElementById('display-patient-name');
+
 
         const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // Lunes a Domingo
 
-        // --- Cargar Medicamentos del Local Storage ---
+        // --- Cargar Datos del Local Storage ---
         let medications = JSON.parse(localStorage.getItem('medications')) || [];
+        let currentPatientName = localStorage.getItem('currentPatientName') || 'Mi Pastillero'; // Nombre por defecto
 
         // --- Funciones ---
 
@@ -364,6 +412,23 @@
         function saveMedications() {
             localStorage.setItem('medications', JSON.stringify(medications));
         }
+
+         /**
+          * Guarda el nombre del paciente actual en Local Storage.
+          */
+         function savePatientName() {
+             const newName = patientNameInput.value.trim();
+             if (newName) {
+                 currentPatientName = newName;
+                 localStorage.setItem('currentPatientName', currentPatientName);
+                 displayPatientName.textContent = currentPatientName; // Actualizar display
+                 patientNameInput.value = currentPatientName; // Sincronizar input
+                 // Opcional: Mostrar mensaje de éxito brevemente
+                 // alert('Nombre del paciente guardado.');
+             } else {
+                 alert('Por favor, introduce un nombre para el paciente.');
+             }
+         }
 
         /**
          * Obtiene la clase CSS y el texto para una etiqueta de prioridad.
@@ -397,7 +462,6 @@
                  medListContainer.removeChild(noMedsMessage);
             }
 
-
             if (!hasMedications) {
                 medListContainer.appendChild(noMedsMessage); // Añadirlo de nuevo si no hay meds
                 noMedsMessage.style.display = 'block';
@@ -408,7 +472,6 @@
             printButton.style.display = hasMedications ? 'inline-block' : 'none';
             resetWeekButton.style.display = hasMedications ? 'inline-block' : 'none';
             exportCsvButton.style.display = hasMedications ? 'inline-block' : 'none';
-            // El botón de importar siempre está visible
             importCsvButton.style.display = 'inline-block';
 
 
@@ -645,12 +708,11 @@
          * Reinicia las marcas de todos los días para todos los medicamentos.
          */
         function resetWeekMarks() {
-            console.log("Reiniciar Semana: Botón pulsado."); // Log de depuración
+            console.log("Reiniciar Semana: Botón pulsado.");
             if (confirm('¿Estás seguro de que quieres borrar todas las marcas de la semana?')) {
-                console.log("Reiniciar Semana: Confirmación aceptada."); // Log de depuración
+                console.log("Reiniciar Semana: Confirmación aceptada.");
                 let changesMade = false;
                 medications.forEach(med => {
-                    // Verificar si realmente hay alguna marca para borrar
                     if (med.days.some(dayTaken => dayTaken === true)) {
                         med.days = Array(7).fill(false);
                         changesMade = true;
@@ -661,23 +723,23 @@
                     saveMedications();
                     renderMedications();
                     alert('Marcas de la semana reiniciadas.');
-                    console.log("Reiniciar Semana: Marcas reiniciadas y guardadas."); // Log de depuración
+                    console.log("Reiniciar Semana: Marcas reiniciadas y guardadas.");
                 } else {
                     alert('No había ninguna marca para reiniciar.');
-                    console.log("Reiniciar Semana: No se hicieron cambios."); // Log de depuración
+                    console.log("Reiniciar Semana: No se hicieron cambios.");
                 }
             } else {
-                 console.log("Reiniciar Semana: Confirmación cancelada."); // Log de depuración
+                 console.log("Reiniciar Semana: Confirmación cancelada.");
             }
         }
 
         /**
-         * Escapa un valor para usarlo en un CSV (envuelve en comillas si contiene coma, comillas o nueva línea).
+         * Escapa un valor para usarlo en un CSV.
          * @param {*} value - El valor a escapar.
          * @returns {string} - El valor escapado para CSV.
          */
         function escapeCsvValue(value) {
-            const stringValue = String(value || ''); // Convertir a string, manejar null/undefined
+            const stringValue = String(value || '');
             if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
                 const escapedValue = stringValue.replace(/"/g, '""');
                 return `"${escapedValue}"`;
@@ -686,17 +748,17 @@
         }
 
         /**
-         * Exporta la lista actual de medicamentos a un archivo CSV.
+         * Exporta la lista actual de medicamentos a un archivo CSV, incluyendo el nombre del paciente.
          */
         function exportToCsv() {
-            console.log("Exportar CSV: Iniciando..."); // Log de depuración
+            console.log("Exportar CSV: Iniciando...");
             if (medications.length === 0) {
                 alert("No hay medicamentos para exportar.");
-                console.log("Exportar CSV: No hay medicamentos."); // Log de depuración
+                console.log("Exportar CSV: No hay medicamentos.");
                 return;
             }
 
-            try { // Envolver en try...catch
+            try {
                 const headers = [
                     "Nombre", "Dosis", "Grupo de Tomas", "Horario",
                     "Prioridad", "Observaciones"
@@ -711,30 +773,34 @@
                     escapeCsvValue(med.observations)
                 ].join(','));
 
-                const csvContent = [headers.join(','), ...rows].join('\n');
-                console.log("Exportar CSV: Contenido CSV generado."); // Log de depuración
+                // Añadir línea con el nombre del paciente (como comentario CSV)
+                const patientLine = `# Paciente: ${currentPatientName || 'No especificado'}`;
+                const csvContent = [patientLine, headers.join(','), ...rows].join('\n');
+                console.log("Exportar CSV: Contenido CSV generado.");
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                console.log("Exportar CSV: Blob creado."); // Log de depuración
+                console.log("Exportar CSV: Blob creado.");
 
                 const link = document.createElement("a");
                 if (link.download !== undefined) {
                     const url = URL.createObjectURL(blob);
+                    // Crear nombre de archivo seguro
+                    const safePatientName = (currentPatientName || 'paciente').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    const filename = `medicamentos_${safePatientName}.csv`;
+
                     link.setAttribute("href", url);
-                    link.setAttribute("download", "mis_medicamentos.csv");
+                    link.setAttribute("download", filename);
                     link.style.visibility = 'hidden';
                     document.body.appendChild(link);
-                    console.log("Exportar CSV: Enlace creado y añadido, simulando clic..."); // Log de depuración
+                    console.log(`Exportar CSV: Descargando archivo: ${filename}`);
                     link.click();
-                    console.log("Exportar CSV: Clic simulado."); // Log de depuración
                     document.body.removeChild(link);
-                    console.log("Exportar CSV: Enlace eliminado."); // Log de depuración
                 } else {
-                    console.warn("Exportar CSV: Descarga directa no soportada."); // Log de depuración
+                    console.warn("Exportar CSV: Descarga directa no soportada.");
                     alert("La descarga directa no es soportada por tu navegador.");
                 }
              } catch (error) {
-                 console.error("Exportar CSV: Error durante la exportación:", error); // Log de depuración
+                 console.error("Exportar CSV: Error durante la exportación:", error);
                  alert("Ocurrió un error al intentar exportar a CSV.");
              }
         }
@@ -745,9 +811,7 @@
          */
         function handleCsvImport(event) {
             const file = event.target.files[0];
-            if (!file) {
-                return;
-            }
+            if (!file) return;
             if (!file.name.toLowerCase().endsWith('.csv')) {
                 alert("Por favor, selecciona un archivo con formato .csv");
                 event.target.value = null;
@@ -755,16 +819,35 @@
             }
 
             const reader = new FileReader();
-
             reader.onload = function(e) {
                 const csvContent = e.target.result;
-                if (confirm('¿Importar archivo CSV? Esto reemplazará tu lista actual de medicamentos.')) {
+                // Extraer nombre del paciente si está en la primera línea como comentario
+                let potentialPatientName = '';
+                const firstLine = csvContent.split('\n')[0];
+                if (firstLine.startsWith('# Paciente:')) {
+                    potentialPatientName = firstLine.substring('# Paciente:'.length).trim();
+                }
+
+                let confirmMessage = '¿Importar archivo CSV? Esto reemplazará tu lista actual de medicamentos.';
+                if (potentialPatientName) {
+                    confirmMessage += `\n\nEl archivo parece ser del paciente: ${potentialPatientName}.\n¿Quieres actualizar también el nombre del paciente actual?`;
+                }
+
+
+                if (confirm(confirmMessage)) {
                     try {
-                        const importedMeds = parseCsvContent(csvContent);
+                        const importedMeds = parseCsvContent(csvContent); // Parsear todo el contenido
                         if (importedMeds.length > 0) {
-                            medications = importedMeds;
-                            saveMedications();
-                            renderMedications();
+                            medications = importedMeds; // Reemplazar lista
+                            // Actualizar nombre del paciente si se encontró y el usuario aceptó implícitamente (o preguntar explícitamente)
+                            if (potentialPatientName) {
+                                currentPatientName = potentialPatientName;
+                                localStorage.setItem('currentPatientName', currentPatientName);
+                                displayPatientName.textContent = currentPatientName;
+                                patientNameInput.value = currentPatientName;
+                            }
+                            saveMedications(); // Guardar nueva lista
+                            renderMedications(); // Renderizar
                             alert(`Importación completada. Se importaron ${importedMeds.length} medicamentos.`);
                         } else {
                              alert("No se encontraron medicamentos válidos en el archivo CSV o el formato no es correcto.");
@@ -779,95 +862,97 @@
                     event.target.value = null;
                 }
             };
-
             reader.onerror = function(e) {
                 console.error("Error al leer el archivo:", e);
                 alert("Ocurrió un error al intentar leer el archivo.");
                  event.target.value = null;
             };
-
             reader.readAsText(file);
         }
 
         /**
          * Parsea el contenido de un archivo CSV.
-         * Asume un formato simple: Nombre,Dosis,Grupo de Tomas,Horario,Prioridad,Observaciones
-         * Maneja valores entre comillas dobles que pueden contener comas.
          * @param {string} csvText - El contenido del archivo CSV.
          * @returns {Array<object>} - Un array de objetos de medicamento.
          */
         function parseCsvContent(csvText) {
-            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n'); // Normalizar saltos de línea
-            if (lines.length < 2) { // Necesita al menos cabecera y una línea de datos
-                 throw new Error("El archivo CSV está vacío o no contiene datos.");
+            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
+            if (lines.length === 0) {
+                 throw new Error("El archivo CSV está vacío.");
             }
 
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, '')); // Limpiar comillas de cabeceras
+            let headerLineIndex = 0;
+            // Saltar líneas de comentario iniciales (ej. # Paciente:)
+            while (lines[headerLineIndex] && lines[headerLineIndex].startsWith('#')) {
+                headerLineIndex++;
+            }
+
+            if (headerLineIndex >= lines.length -1) { // No hay cabecera o no hay datos
+                 throw new Error("El archivo CSV no contiene cabeceras o datos válidos.");
+            }
+
+            const headers = lines[headerLineIndex].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
             const importedMeds = [];
 
-            // Mapeo de índices basado en cabeceras encontradas (más flexible)
+            // Mapeo de índices
              const nameIndex = headers.findIndex(h => h.includes("nombre"));
             const dosageIndex = headers.findIndex(h => h.includes("dosis"));
-            const groupIndex = headers.findIndex(h => h.includes("grupo")); // 'grupo de tomas'
+            const groupIndex = headers.findIndex(h => h.includes("grupo"));
             const scheduleIndex = headers.findIndex(h => h.includes("horario"));
             const priorityIndex = headers.findIndex(h => h.includes("prioridad"));
             const obsIndex = headers.findIndex(h => h.includes("observaciones"));
 
-
-            // Verificar que las columnas esenciales existen
             if (nameIndex === -1 || scheduleIndex === -1) {
                  throw new Error("El archivo CSV debe contener al menos las columnas 'Nombre' y 'Horario'. Revisa las cabeceras.");
             }
 
-
-            for (let i = 1; i < lines.length; i++) {
+            // Procesar líneas de datos
+            for (let i = headerLineIndex + 1; i < lines.length; i++) {
                 const line = lines[i].trim();
-                if (!line) continue; // Saltar líneas vacías
+                if (!line) continue;
 
-                // Parser simple que maneja comillas básicas
+                // Parser simple
                 const values = [];
                 let currentVal = '';
                 let inQuotes = false;
                 for (let j = 0; j < line.length; j++) {
                     const char = line[j];
                     const nextChar = line[j+1];
-
-                    if (char === '"' && !inQuotes) {
+                    if (char === '"' && !inQuotes && currentVal === '') { // Comilla al inicio del campo
                         inQuotes = true;
-                    } else if (char === '"' && inQuotes) {
-                        if (nextChar === '"') { // Es una comilla doble escapada ""
-                             currentVal += '"';
-                             j++; // Saltar la siguiente comilla
-                        } else {
-                             inQuotes = false; // Fin de campo entre comillas
-                        }
+                    } else if (char === '"' && inQuotes && nextChar === '"') { // Comilla doble escapada
+                         currentVal += '"';
+                         j++;
+                    } else if (char === '"' && inQuotes && (nextChar === ',' || nextChar === undefined)) { // Comilla al final del campo
+                         inQuotes = false;
                     } else if (char === ',' && !inQuotes) {
-                        values.push(currentVal.trim()); // No quitar comillas aquí, se hace al final
+                        values.push(currentVal);
                         currentVal = '';
                     } else {
                         currentVal += char;
                     }
                 }
-                 values.push(currentVal.trim()); // Añadir último valor
+                 values.push(currentVal); // Añadir último valor
 
-                // Limpiar comillas envolventes solo si existen
-                const cleanedValues = values.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
+                 // Limpiar comillas envolventes si las hubiera (el parser anterior debería manejarlas)
+                 // const cleanedValues = values.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
+                 const cleanedValues = values; // Usar valores directamente del parser mejorado
 
 
-                // Crear objeto medicamento si hay datos válidos
+                // Crear objeto medicamento
                 const name = cleanedValues[nameIndex];
                 const schedule = cleanedValues[scheduleIndex];
 
-                if (name && schedule) { // Nombre y Horario son mínimos requeridos
+                if (name && schedule) {
                      const newMed = {
-                        id: Date.now() + i, // ID único simple para importados
+                        id: Date.now() + i,
                         name: name,
                         dosage: dosageIndex !== -1 ? cleanedValues[dosageIndex] : '',
                         takeGroup: groupIndex !== -1 ? cleanedValues[groupIndex] : '',
                         schedule: schedule,
                         priority: priorityIndex !== -1 ? (cleanedValues[priorityIndex] || 'media') : 'media',
                         observations: obsIndex !== -1 ? cleanedValues[obsIndex] : '',
-                        days: Array(7).fill(false) // Estado inicial de días
+                        days: Array(7).fill(false)
                     };
                     importedMeds.push(newMed);
                 } else {
@@ -882,11 +967,13 @@
         addMedForm.addEventListener('submit', addMedication);
         editMedForm.addEventListener('submit', saveEditedMedication);
         printButton.addEventListener('click', () => { window.print(); });
-        resetWeekButton.addEventListener('click', resetWeekMarks); // Listener para reiniciar semana
-        exportCsvButton.addEventListener('click', exportToCsv); // Listener para exportar CSV
+        resetWeekButton.addEventListener('click', resetWeekMarks);
+        exportCsvButton.addEventListener('click', exportToCsv);
+        // Listener para guardar nombre paciente
+        savePatientNameButton.addEventListener('click', savePatientName);
         // Listener para el botón de importar que activa el input oculto
         importCsvButton.addEventListener('click', () => {
-            csvImportInput.value = null; // Resetear input para permitir seleccionar mismo archivo
+            csvImportInput.value = null;
             csvImportInput.click();
         });
         // Listener para cuando se selecciona un archivo en el input oculto
@@ -901,7 +988,13 @@
         }
 
         // --- Inicialización ---
-        document.addEventListener('DOMContentLoaded', renderMedications);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar y mostrar nombre del paciente inicial
+            patientNameInput.value = currentPatientName;
+            displayPatientName.textContent = currentPatientName;
+            // Renderizar medicamentos
+            renderMedications();
+        });
 
     </script>
 
