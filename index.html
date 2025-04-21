@@ -21,6 +21,18 @@
         .text-pastel-pink { color: #f8c8dc; }
         .text-pastel-yellow { color: #fdfd96; }
 
+        /* Botones de acción pequeños */
+        .action-button {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease-in-out;
+        }
+         .action-button:hover {
+             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+         }
+
         /* Burbujas de días */
         .day-bubble {
             transition: background-color 0.3s ease, transform 0.2s ease;
@@ -120,6 +132,9 @@
             header,
             section.mb-8, /* Formulario Añadir Med */
             #print-button, /* Botón/Icono de Imprimir */
+            #reset-week-button, /* Botón Reiniciar */
+            #import-csv-button, /* Botón Importar */
+            #export-csv-button, /* Botón Exportar */
             .modal,
             .actionsDiv /* Botones Editar/Eliminar en tarjetas */
              {
@@ -247,11 +262,21 @@
         </section>
 
         <section>
-             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-700">Mis Medicamentos</h2>
-                <button id="print-button" title="Imprimir Lista" class="text-gray-600 hover:text-blue-600 p-2 rounded-md hover:bg-gray-100 transition duration-150 ease-in-out">
-                    <i class="fas fa-print fa-lg"></i>
-                </button>
+             <div class="flex justify-between items-center mb-4 flex-wrap gap-2"> <h2 class="text-xl font-semibold text-gray-700">Mis Medicamentos</h2>
+                <div class="flex gap-2 items-center"> <button id="reset-week-button" title="Reiniciar Semana" class="action-button bg-yellow-100 hover:bg-yellow-200 text-yellow-800">
+                        <i class="fas fa-undo mr-1"></i> Reiniciar Semana
+                    </button>
+                    <button id="import-csv-button" title="Importar Lista desde CSV" class="action-button bg-green-100 hover:bg-green-200 text-green-800">
+                        <i class="fas fa-file-upload mr-1"></i> Importar CSV
+                    </button>
+                     <button id="export-csv-button" title="Exportar Lista a CSV" class="action-button bg-blue-100 hover:bg-blue-200 text-blue-800">
+                        <i class="fas fa-file-download mr-1"></i> Exportar CSV
+                    </button>
+                    <button id="print-button" title="Imprimir Lista" class="text-gray-600 hover:text-blue-600 p-2 rounded-md hover:bg-gray-100 transition duration-150 ease-in-out">
+                        <i class="fas fa-print fa-lg"></i>
+                    </button>
+                     <input type="file" id="csv-import-input" accept=".csv" style="display: none;">
+                </div>
             </div>
             <div id="med-list" class="space-y-4">
                 <p id="no-meds-message" class="text-gray-500 text-center py-4">Aún no has añadido ningún medicamento.</p>
@@ -320,7 +345,11 @@
         const editMedScheduleInput = document.getElementById('edit-med-schedule');
         const editMedPriorityInput = document.getElementById('edit-med-priority');
         const editMedObservationsInput = document.getElementById('edit-med-observations');
-        const printButton = document.getElementById('print-button'); // Cambiado ID
+        const printButton = document.getElementById('print-button');
+        const resetWeekButton = document.getElementById('reset-week-button'); // Botón Reiniciar Semana
+        const importCsvButton = document.getElementById('import-csv-button'); // Botón Importar CSV
+        const exportCsvButton = document.getElementById('export-csv-button'); // Botón Exportar CSV
+        const csvImportInput = document.getElementById('csv-import-input'); // Input oculto para importar
 
         const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D']; // Lunes a Domingo
 
@@ -361,14 +390,29 @@
         function renderMedications() {
             medListContainer.innerHTML = ''; // Limpiar contenedor
 
-            if (medications.length === 0) {
-                medListContainer.appendChild(noMedsMessage);
-                noMedsMessage.style.display = 'block';
-                printButton.style.display = 'none'; // Ocultar botón imprimir si no hay meds
-            } else {
-                noMedsMessage.style.display = 'none';
-                printButton.style.display = 'inline-block'; // Mostrar botón imprimir
+            const hasMedications = medications.length > 0;
 
+            // Mover el mensaje de "no meds" fuera del contenedor principal antes de limpiarlo si existe
+            if (noMedsMessage.parentNode === medListContainer) {
+                 medListContainer.removeChild(noMedsMessage);
+            }
+
+
+            if (!hasMedications) {
+                medListContainer.appendChild(noMedsMessage); // Añadirlo de nuevo si no hay meds
+                noMedsMessage.style.display = 'block';
+            } else {
+                 noMedsMessage.style.display = 'none';
+            }
+             // Mostrar/ocultar botones de acción según si hay medicamentos
+            printButton.style.display = hasMedications ? 'inline-block' : 'none';
+            resetWeekButton.style.display = hasMedications ? 'inline-block' : 'none';
+            exportCsvButton.style.display = hasMedications ? 'inline-block' : 'none';
+            // El botón de importar siempre está visible
+            importCsvButton.style.display = 'inline-block';
+
+
+            if (hasMedications) {
                 // 1. Ordenar medicamentos: Primero por Grupo de Tomas, luego por Horario
                 const sortedMeds = [...medications].sort((a, b) => {
                     const groupA = (a.takeGroup || 'ZZZ').trim().toLowerCase();
@@ -438,7 +482,7 @@
                     });
 
                     const actionsDiv = document.createElement('div');
-                    actionsDiv.className = 'actionsDiv flex gap-2 items-center ml-0 md:ml-4 flex-shrink-0'; // Añadida clase para ocultar en print
+                    actionsDiv.className = 'actionsDiv flex gap-2 items-center ml-0 md:ml-4 flex-shrink-0'; // Clase para ocultar en print
                     // --- Botones de Editar y Eliminar ---
                     const editButton = document.createElement('button');
                     editButton.className = 'text-blue-500 hover:text-blue-700 transition duration-150 p-1';
@@ -597,15 +641,257 @@
             }
         }
 
-        // --- Función exportToPdf eliminada ---
+        /**
+         * Reinicia las marcas de todos los días para todos los medicamentos.
+         */
+        function resetWeekMarks() {
+            console.log("Reiniciar Semana: Botón pulsado."); // Log de depuración
+            if (confirm('¿Estás seguro de que quieres borrar todas las marcas de la semana?')) {
+                console.log("Reiniciar Semana: Confirmación aceptada."); // Log de depuración
+                let changesMade = false;
+                medications.forEach(med => {
+                    // Verificar si realmente hay alguna marca para borrar
+                    if (med.days.some(dayTaken => dayTaken === true)) {
+                        med.days = Array(7).fill(false);
+                        changesMade = true;
+                    }
+                });
+
+                if (changesMade) {
+                    saveMedications();
+                    renderMedications();
+                    alert('Marcas de la semana reiniciadas.');
+                    console.log("Reiniciar Semana: Marcas reiniciadas y guardadas."); // Log de depuración
+                } else {
+                    alert('No había ninguna marca para reiniciar.');
+                    console.log("Reiniciar Semana: No se hicieron cambios."); // Log de depuración
+                }
+            } else {
+                 console.log("Reiniciar Semana: Confirmación cancelada."); // Log de depuración
+            }
+        }
+
+        /**
+         * Escapa un valor para usarlo en un CSV (envuelve en comillas si contiene coma, comillas o nueva línea).
+         * @param {*} value - El valor a escapar.
+         * @returns {string} - El valor escapado para CSV.
+         */
+        function escapeCsvValue(value) {
+            const stringValue = String(value || ''); // Convertir a string, manejar null/undefined
+            if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                const escapedValue = stringValue.replace(/"/g, '""');
+                return `"${escapedValue}"`;
+            }
+            return stringValue;
+        }
+
+        /**
+         * Exporta la lista actual de medicamentos a un archivo CSV.
+         */
+        function exportToCsv() {
+            console.log("Exportar CSV: Iniciando..."); // Log de depuración
+            if (medications.length === 0) {
+                alert("No hay medicamentos para exportar.");
+                console.log("Exportar CSV: No hay medicamentos."); // Log de depuración
+                return;
+            }
+
+            try { // Envolver en try...catch
+                const headers = [
+                    "Nombre", "Dosis", "Grupo de Tomas", "Horario",
+                    "Prioridad", "Observaciones"
+                ];
+
+                const rows = medications.map(med => [
+                    escapeCsvValue(med.name),
+                    escapeCsvValue(med.dosage),
+                    escapeCsvValue(med.takeGroup),
+                    escapeCsvValue(med.schedule),
+                    escapeCsvValue(med.priority),
+                    escapeCsvValue(med.observations)
+                ].join(','));
+
+                const csvContent = [headers.join(','), ...rows].join('\n');
+                console.log("Exportar CSV: Contenido CSV generado."); // Log de depuración
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                console.log("Exportar CSV: Blob creado."); // Log de depuración
+
+                const link = document.createElement("a");
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "mis_medicamentos.csv");
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    console.log("Exportar CSV: Enlace creado y añadido, simulando clic..."); // Log de depuración
+                    link.click();
+                    console.log("Exportar CSV: Clic simulado."); // Log de depuración
+                    document.body.removeChild(link);
+                    console.log("Exportar CSV: Enlace eliminado."); // Log de depuración
+                } else {
+                    console.warn("Exportar CSV: Descarga directa no soportada."); // Log de depuración
+                    alert("La descarga directa no es soportada por tu navegador.");
+                }
+             } catch (error) {
+                 console.error("Exportar CSV: Error durante la exportación:", error); // Log de depuración
+                 alert("Ocurrió un error al intentar exportar a CSV.");
+             }
+        }
+
+        /**
+         * Maneja la selección de un archivo CSV para importar.
+         * @param {Event} event - El evento 'change' del input file.
+         */
+        function handleCsvImport(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert("Por favor, selecciona un archivo con formato .csv");
+                event.target.value = null;
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const csvContent = e.target.result;
+                if (confirm('¿Importar archivo CSV? Esto reemplazará tu lista actual de medicamentos.')) {
+                    try {
+                        const importedMeds = parseCsvContent(csvContent);
+                        if (importedMeds.length > 0) {
+                            medications = importedMeds;
+                            saveMedications();
+                            renderMedications();
+                            alert(`Importación completada. Se importaron ${importedMeds.length} medicamentos.`);
+                        } else {
+                             alert("No se encontraron medicamentos válidos en el archivo CSV o el formato no es correcto.");
+                        }
+                    } catch (error) {
+                        console.error("Error al procesar el archivo CSV:", error);
+                        alert(`Error al procesar el archivo CSV: ${error.message}`);
+                    } finally {
+                         event.target.value = null;
+                    }
+                } else {
+                    event.target.value = null;
+                }
+            };
+
+            reader.onerror = function(e) {
+                console.error("Error al leer el archivo:", e);
+                alert("Ocurrió un error al intentar leer el archivo.");
+                 event.target.value = null;
+            };
+
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parsea el contenido de un archivo CSV.
+         * Asume un formato simple: Nombre,Dosis,Grupo de Tomas,Horario,Prioridad,Observaciones
+         * Maneja valores entre comillas dobles que pueden contener comas.
+         * @param {string} csvText - El contenido del archivo CSV.
+         * @returns {Array<object>} - Un array de objetos de medicamento.
+         */
+        function parseCsvContent(csvText) {
+            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n'); // Normalizar saltos de línea
+            if (lines.length < 2) { // Necesita al menos cabecera y una línea de datos
+                 throw new Error("El archivo CSV está vacío o no contiene datos.");
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, '')); // Limpiar comillas de cabeceras
+            const importedMeds = [];
+
+            // Mapeo de índices basado en cabeceras encontradas (más flexible)
+             const nameIndex = headers.findIndex(h => h.includes("nombre"));
+            const dosageIndex = headers.findIndex(h => h.includes("dosis"));
+            const groupIndex = headers.findIndex(h => h.includes("grupo")); // 'grupo de tomas'
+            const scheduleIndex = headers.findIndex(h => h.includes("horario"));
+            const priorityIndex = headers.findIndex(h => h.includes("prioridad"));
+            const obsIndex = headers.findIndex(h => h.includes("observaciones"));
+
+
+            // Verificar que las columnas esenciales existen
+            if (nameIndex === -1 || scheduleIndex === -1) {
+                 throw new Error("El archivo CSV debe contener al menos las columnas 'Nombre' y 'Horario'. Revisa las cabeceras.");
+            }
+
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue; // Saltar líneas vacías
+
+                // Parser simple que maneja comillas básicas
+                const values = [];
+                let currentVal = '';
+                let inQuotes = false;
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    const nextChar = line[j+1];
+
+                    if (char === '"' && !inQuotes) {
+                        inQuotes = true;
+                    } else if (char === '"' && inQuotes) {
+                        if (nextChar === '"') { // Es una comilla doble escapada ""
+                             currentVal += '"';
+                             j++; // Saltar la siguiente comilla
+                        } else {
+                             inQuotes = false; // Fin de campo entre comillas
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(currentVal.trim()); // No quitar comillas aquí, se hace al final
+                        currentVal = '';
+                    } else {
+                        currentVal += char;
+                    }
+                }
+                 values.push(currentVal.trim()); // Añadir último valor
+
+                // Limpiar comillas envolventes solo si existen
+                const cleanedValues = values.map(v => v.startsWith('"') && v.endsWith('"') ? v.slice(1, -1).replace(/""/g, '"') : v);
+
+
+                // Crear objeto medicamento si hay datos válidos
+                const name = cleanedValues[nameIndex];
+                const schedule = cleanedValues[scheduleIndex];
+
+                if (name && schedule) { // Nombre y Horario son mínimos requeridos
+                     const newMed = {
+                        id: Date.now() + i, // ID único simple para importados
+                        name: name,
+                        dosage: dosageIndex !== -1 ? cleanedValues[dosageIndex] : '',
+                        takeGroup: groupIndex !== -1 ? cleanedValues[groupIndex] : '',
+                        schedule: schedule,
+                        priority: priorityIndex !== -1 ? (cleanedValues[priorityIndex] || 'media') : 'media',
+                        observations: obsIndex !== -1 ? cleanedValues[obsIndex] : '',
+                        days: Array(7).fill(false) // Estado inicial de días
+                    };
+                    importedMeds.push(newMed);
+                } else {
+                    console.warn(`Línea ${i+1} ignorada por falta de Nombre u Horario: ${line}`);
+                }
+            }
+            return importedMeds;
+        }
+
 
         // --- Event Listeners ---
         addMedForm.addEventListener('submit', addMedication);
         editMedForm.addEventListener('submit', saveEditedMedication);
-        // Listener para el botón de imprimir
-        printButton.addEventListener('click', () => {
-            window.print(); // Llama a la función de impresión del navegador
+        printButton.addEventListener('click', () => { window.print(); });
+        resetWeekButton.addEventListener('click', resetWeekMarks); // Listener para reiniciar semana
+        exportCsvButton.addEventListener('click', exportToCsv); // Listener para exportar CSV
+        // Listener para el botón de importar que activa el input oculto
+        importCsvButton.addEventListener('click', () => {
+            csvImportInput.value = null; // Resetear input para permitir seleccionar mismo archivo
+            csvImportInput.click();
         });
+        // Listener para cuando se selecciona un archivo en el input oculto
+        csvImportInput.addEventListener('change', handleCsvImport);
+
 
         // Cerrar modal si se hace clic fuera de él
         window.onclick = function(event) {
